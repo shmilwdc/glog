@@ -14,6 +14,7 @@ func init() {
         conf.WithLogPath("/tmp"),
         conf.WithLogName("test"),
         conf.WithLogLevel("info"),
+        conf.WithLogType("console"),
         conf.WithMaxSize(1),
         conf.WithRotateType("size"),
         conf.WithRotateType(""),

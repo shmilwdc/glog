@@ -4,6 +4,7 @@ type Conf struct {
     LogPath    string     //日志保存的路径
     LogName    string     //日志保存的名称
     LogLevel   string     //日志记录的级别
+    LogType    LogType    //日志记录的类型 console/json
     RotateType RotateType //日志切割的类型 size/time
     MaxSize    int        //日志分割的尺寸 mb
     MaxAge     int        //分割日志的最大保存时间 day
@@ -17,6 +18,7 @@ var DefaultConf = Conf{
     LogPath:    "/var/log",
     LogName:    "output",
     LogLevel:   "debug",
+    LogType:    Json,
     RotateType: Time,
     MaxSize:    100,
     MaxAge:     7,

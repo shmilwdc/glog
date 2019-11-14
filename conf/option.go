@@ -20,6 +20,12 @@ func WithLogLevel(logLevel string) Option {
     }
 }
 
+func WithLogType(logType LogType) Option {
+    return func(conf *Conf) {
+        conf.LogType = logType
+    }
+}
+
 func WithRotateType(rotateType RotateType) Option {
     return func(conf *Conf) {
         conf.RotateType = rotateType

@@ -55,7 +55,7 @@ func New(opts ...conf.Option) *Log {
     atomicLevel := zap.NewAtomicLevel()
     atomicLevel.SetLevel(parseLevel(o.LogLevel))
 
-    logger := newZapLogger(atomicLevel, parseLevel(o.Stacktrace), zapcore.NewMultiWriteSyncer(writers...))
+    logger := newZapLogger(o.LogType, atomicLevel, parseLevel(o.Stacktrace), zapcore.NewMultiWriteSyncer(writers...))
     zap.RedirectStdLog(logger)
 
     logger = logger.With(zap.String("service", o.LogName))
@@ -63,7 +63,7 @@ func New(opts ...conf.Option) *Log {
     return &Log{logger: logger, level: atomicLevel}
 }
 
-func newZapLogger(level zap.AtomicLevel, stacktrace zapcore.Level, ws zapcore.WriteSyncer) *zap.Logger {
+func newZapLogger(typ conf.LogType, level zap.AtomicLevel, stacktrace zapcore.Level, ws zapcore.WriteSyncer) *zap.Logger {
     encoderConfig := zapcore.EncoderConfig{
         TimeKey:        "time",
         LevelKey:       "level",
@@ -75,11 +75,19 @@ func newZapLogger(level zap.AtomicLevel, stacktrace zapcore.Level, ws zapcore.Wr
         EncodeLevel:    zapcore.LowercaseLevelEncoder,  // 小写编码器
         EncodeTime:     zapcore.ISO8601TimeEncoder,     // ISO8601 UTC 时间格式
         EncodeDuration: zapcore.SecondsDurationEncoder, //
-        EncodeCaller:   zapcore.FullCallerEncoder,      // 全路径编码器
+        EncodeCaller:   zapcore.ShortCallerEncoder,      // 全路径编码器
         EncodeName:     zapcore.FullNameEncoder,
     }
 
-    encoder := zapcore.NewJSONEncoder(encoderConfig)
+    var encoder zapcore.Encoder
+    switch typ {
+    case conf.Console:
+        encoder = zapcore.NewConsoleEncoder(encoderConfig)
+    case conf.Json:
+        encoder = zapcore.NewJSONEncoder(encoderConfig)
+    default:
+        encoder = zapcore.NewJSONEncoder(encoderConfig)
+    }
 
     core := zapcore.NewCore(encoder, ws, level)
 
